@@ -49,7 +49,7 @@ const Login: React.FC = () => {
                 <Button type="primary" htmlType="submit" className="login-form-button">
                     Cadastrar
                 </Button>
-                Já tem uma conta? <Link to="/cadastro">Faça login!</Link>
+                Já tem uma conta? <Link to="/login">Faça login!</Link>
             </Form.Item>
         </Form>
         </div>

@@ -5,7 +5,7 @@ import {Link, redirect} from "react-router-dom";
 
 const Login: React.FC = () => {
     const logar = (values: any) => {
-        redirect("/");
+        console.log('Received values of form: ', values);
     };
     return (
         <Form name={"formLogin"}
