@@ -7,6 +7,7 @@ import {Button, ConfigProvider, Layout} from "antd";
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import Cadastro from "./pages/Cadastro";
 import {Footer} from "antd/es/layout/layout";
+import Dashboard from "./pages/Dashboard";
 
 const primaryColor: string = '#8f0ca3'
 
@@ -23,7 +24,8 @@ root.render(
                 }
             }}>
                 <Routes>
-                    <Route path={"/"} element={<Login/>}/>
+                    <Route path={"/"} element={<Dashboard/>}/>
+                    <Route path={"/login"} element={<Login/>}/>
                     <Route path={"/cadastro"} element={<Cadastro/>}/>
                 </Routes>
             </ConfigProvider>

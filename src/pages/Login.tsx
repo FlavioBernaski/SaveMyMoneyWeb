@@ -1,11 +1,11 @@
 import {Button, Checkbox, Form, Input, Menu} from 'antd';
 import {LockOutlined, UserOutlined} from '@ant-design/icons';
 import React from 'react';
-import {Link} from "react-router-dom";
+import {Link, redirect} from "react-router-dom";
 
 const Login: React.FC = () => {
     const logar = (values: any) => {
-
+        redirect("/");
     };
     return (
         <Form name={"formLogin"}
@@ -37,7 +37,7 @@ const Login: React.FC = () => {
 
             <Form.Item>
                 <Button type="primary" htmlType="submit" className="login-form-button">
-                    Entre
+                    Entrar
                 </Button>
                 Não tem uma conta? <Link to="cadastro">Cadastre-se agora!</Link>
             </Form.Item>
