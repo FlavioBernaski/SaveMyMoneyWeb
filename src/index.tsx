@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles/index.css';
 import Login from './pages/Login';
@@ -8,6 +8,8 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import Cadastro from "./pages/Cadastro";
 import {Footer} from "antd/es/layout/layout";
 import Dashboard from "./pages/Dashboard";
+import App from "./App";
+import {AuthProvider} from "./contexts/Auth/AuthProvider";
 
 const primaryColor: string = '#8f0ca3'
 
@@ -16,20 +18,18 @@ const root = ReactDOM.createRoot(
 );
 root.render(
     <React.StrictMode>
-        <BrowserRouter>
-            <ConfigProvider theme={{
-                token: {colorPrimary: primaryColor},
-                components: {
-                    Button: {colorPrimary: primaryColor}
-                }
-            }}>
-                <Routes>
-                    <Route path={"/"} element={<Dashboard/>}/>
-                    <Route path={"/login"} element={<Login/>}/>
-                    <Route path={"/cadastro"} element={<Cadastro/>}/>
-                </Routes>
-            </ConfigProvider>
-        </BrowserRouter>
+        <AuthProvider>
+            <BrowserRouter>
+                <ConfigProvider theme={{
+                    token: {colorPrimary: primaryColor},
+                    components: {
+                        Button: {colorPrimary: primaryColor}
+                    }
+                }}>
+                    <App/>
+                </ConfigProvider>
+            </BrowserRouter>
+        </AuthProvider>
     </React.StrictMode>
 );
 

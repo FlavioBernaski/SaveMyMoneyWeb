@@ -1,17 +1,28 @@
 import {Button, Checkbox, Form, Input, Menu} from 'antd';
 import {LockOutlined, UserOutlined} from '@ant-design/icons';
-import React from 'react';
-import {Link, redirect} from "react-router-dom";
+import React, {useContext, useEffect, useState} from 'react';
+import {Link, redirect, Route, useNavigate} from "react-router-dom";
+import {Usuario} from "../types/Usuario";
+import {AuthContext} from "../contexts/Auth/AuthContext";
 
 const Login: React.FC = () => {
-    const logar = (values: any) => {
-        console.log('Received values of form: ', values);
+    const auth = useContext(AuthContext);
+    const navigate = useNavigate();
+    const login = async (values: any) => {
+        if (values.email && values.senha) {
+            const isLogged = await auth.signin(values.email, values.senha);
+            if (isLogged) {
+                navigate("/");
+            } else {
+                alert("Deu ruim brother");
+            }
+        }
     };
     return (
         <Form name={"formLogin"}
               className={"login-form"}
               initialValues={{remember: true,}}
-              onFinish={logar}>
+              onFinish={login}>
             <Form.Item
                 name={"email"}
                 rules={[{required: true, message: "Insira seu email para entrar!"}]}>

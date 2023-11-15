@@ -2,7 +2,14 @@ import {Badge, BadgeProps, Calendar, CalendarProps, Layout, Menu} from 'antd';
 import React, {useState} from 'react';
 import {MenuProps} from "antd/lib";
 import type {Dayjs} from 'dayjs';
-import {DesktopOutlined, FileOutlined, PieChartOutlined, TeamOutlined, UserOutlined} from "@ant-design/icons";
+import {
+    DesktopOutlined,
+    FileOutlined,
+    LogoutOutlined,
+    PieChartOutlined,
+    TeamOutlined,
+    UserOutlined
+} from "@ant-design/icons";
 
 const {Header, Content, Footer, Sider} = Layout;
 
@@ -68,6 +75,7 @@ const Login: React.FC = () => {
         ]),
         getItem('Team', 'sub2', <TeamOutlined/>, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
         getItem('Files', '9', <FileOutlined/>),
+        getItem('Sair', '10', <LogoutOutlined/>),
     ];
 
     return (
