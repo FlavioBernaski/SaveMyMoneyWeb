@@ -9,16 +9,19 @@ export const AuthProvider = ({ children }: {children: JSX.Element}) => {
     const api = useApi();
 
     useEffect(() => {
-        const validateToken = async () => {
-            const storageData = localStorage.getItem('token');
-            if (storageData) {
-                const data = await api.validarToken(storageData);
-                if (data.usuario) {
-                    setUsuario(data.usuario);
+        if (usuario == null) {
+            const validateToken = async () => {
+                const storageData = localStorage.getItem('token');
+                if (storageData) {
+                    const data = await api.validarToken(storageData);
+                    console.log(data)
+                    if (data.id) {
+                        setUsuario(data);
+                    }
                 }
             }
+            validateToken()
         }
-        validateToken();
     }, [api]);
 
     const signin = async (email: string, senha: string) => {
