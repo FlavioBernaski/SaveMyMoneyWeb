@@ -1,11 +1,14 @@
 import {Button, Checkbox, Form, Input, Menu} from 'antd';
 import {LockOutlined, UserOutlined} from '@ant-design/icons';
-import React from 'react';
-import {Link} from "react-router-dom";
+import React, {useContext} from 'react';
+import {Link, useNavigate} from "react-router-dom";
+import {AuthContext} from "../contexts/Auth/AuthContext";
 
 const Login: React.FC = () => {
-    const logar = (values: any) => {
-
+    const auth = useContext(AuthContext);
+    const navigate = useNavigate();
+    const cadastro = async (values: any) => {
+        const isLogged = await auth.signin;
     };
     return (
         <div className={"principal"}>
@@ -14,7 +17,7 @@ const Login: React.FC = () => {
               className={"login-form"}
               layout={"vertical"}
               initialValues={{remember: true,}}
-              onFinish={logar}>
+              onFinish={cadastro}>
             <Form.Item
                 name={"email"}
                 label={"Email"}

@@ -1,8 +1,7 @@
-import {Button, Checkbox, Form, Input, Menu} from 'antd';
+import {Button, Checkbox, Form, Input} from 'antd';
 import {LockOutlined, UserOutlined} from '@ant-design/icons';
-import React, {useContext, useEffect, useState} from 'react';
-import {Link, redirect, Route, useNavigate} from "react-router-dom";
-import {Usuario} from "../types/Usuario";
+import React, {useContext} from 'react';
+import {Link, useNavigate} from "react-router-dom";
 import {AuthContext} from "../contexts/Auth/AuthContext";
 
 const Login: React.FC = () => {
@@ -10,11 +9,14 @@ const Login: React.FC = () => {
     const navigate = useNavigate();
     const login = async (values: any) => {
         if (values.email && values.senha) {
-            const isLogged = await auth.signin(values.email, values.senha);
-            if (isLogged) {
+            const response = await auth.signin(values.email, values.senha);
+            if (response === true) {
                 navigate("/");
-            } else {
-                alert("Deu ruim brother");
+            } else if (response === false) {
+                alert("Erro desconhecido ao logar");
+            }
+            else {
+                alert(response);
             }
         }
     };
