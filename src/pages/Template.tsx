@@ -7,7 +7,6 @@ const {Header, Content, Footer, Sider} = Layout;
 
 
 export const Template = ({children}: { children: JSX.Element }) => {
-
     const [collapsed, setCollapsed] = useState(false);
     const auth = useContext(AuthContext);
 

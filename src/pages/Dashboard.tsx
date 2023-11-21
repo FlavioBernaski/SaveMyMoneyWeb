@@ -1,19 +1,20 @@
 import {Badge, Calendar, CalendarProps} from 'antd';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import type {Dayjs} from 'dayjs';
 import {Template} from "./Template";
 import {useApi} from "../hooks/useApi";
 import {Gasto} from "../types/Gasto";
 
-const Login: React.FC = () => {
+const Dashboard: React.FC = () => {
     const api = useApi();
 
     const [listData, setListData] = useState<Gasto[]>([])
+    useEffect(() => {
+        api.listarGastos()
+            .then((data) => setListData(data))
+            .catch((err) => console.error(err.message));
+    }, []);
 
-    const updateListData = async (month: number) => {
-        await api.listarGastos().then((data) => setListData(data)).catch(() => setListData([]))
-        return [{type: "warning", content: "algo"}];
-    }
     const monthCellRender = (value: Dayjs) => {
         const num = value.get("month");
         return num ? (
@@ -26,18 +27,20 @@ const Login: React.FC = () => {
 
     const dateCellRender = (value: Dayjs) => {
         let cell: React.ReactNode;
-        updateListData(value.month()).then(() =>
-            cell = (<ul className="events">
-                    {listData.map((item) => (
-                        <li key={item.id}>
-                            <Badge text={item.descricao}/>
-                        </li>
-                    ))}
-                </ul>
-            )).catch(() =>
-            cell = (<ul className="events">
-
-            </ul>));
+        var totalGasto: number = 0;
+        let filteredList: Gasto[] = listData.filter((data) => new Date(data.dataEntrada).toDateString() === value.toDate().toDateString())
+        filteredList.map((data) => {
+            filteredList.forEach((i) => {
+                totalGasto += i.valor
+            })
+            cell = (<ul className="events" title={"R$" + totalGasto.toFixed(2)}>
+                {listData.map((item) => (
+                    <li key={item.id}>
+                        <Badge status={'success'} text={item.descricao}/>
+                    </li>
+                ))}
+            </ul>)
+        })
         return cell;
     };
     const cellRender: CalendarProps<Dayjs>['cellRender'] = (current, info): React.ReactNode => {
@@ -53,4 +56,4 @@ const Login: React.FC = () => {
     );
 }
 
-export default Login;
+export default Dashboard;

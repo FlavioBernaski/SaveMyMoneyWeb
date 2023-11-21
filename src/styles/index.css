@@ -12,6 +12,12 @@ code {
     monospace;
 }
 
+.events {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .login-form {
   padding-top: 20px;
   margin-left: auto;
