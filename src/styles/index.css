@@ -12,6 +12,19 @@ code {
     monospace;
 }
 
+.content {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  color: #333; /* Change the color as needed */
+  font-size: 24px; /* Adjust the size as per your needs */
+  font-weight: 600; /* Adjust the weight (boldness) as per your needs */
+  margin-bottom: 10px; /* Space below the title. Adjust as needed */
+}
+
 .events {
   margin: 0;
   padding: 0;

@@ -6,8 +6,8 @@ const api = axios.create({
     baseURL: process.env.REACT_APP_API
 })
 api.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
-api.defaults.headers.get['Content-Type'] ='application/json;charset=utf-8';
-api.defaults.headers.get['Accept'] ='application/json;charset=utf-8';
+api.defaults.headers.get['Content-Type'] = 'application/json;charset=utf-8';
+api.defaults.headers.get['Accept'] = 'application/json;charset=utf-8';
 const token = localStorage.getItem('token');
 
 const authHeader = {
@@ -31,6 +31,14 @@ export const useApi = () => ({
     },
     listarGastos: async () => {
         const response = await api.get("/gastos", authHeader);
+        return response.data;
+    },
+    listarCartoes: async () => {
+        const response = await api.get("/cartoes", authHeader);
+        return response.data;
+    },
+    excluirCartao: async (id: string) => {
+        const response = await api.delete("/cartoes/" + id, authHeader);
         return response.data;
     },
     cadastrarCartao: async (cartao: Cartao) => {

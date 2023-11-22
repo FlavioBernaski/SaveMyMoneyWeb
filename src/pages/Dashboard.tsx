@@ -51,7 +51,9 @@ const Dashboard: React.FC = () => {
 
     return (
         <Template>
-            <Calendar cellRender={cellRender} style={{padding: "20px"}}/>
+            <div className={'content'}>
+                <Calendar cellRender={cellRender} style={{padding: "20px"}}/>
+            </div>
         </Template>
     );
 }
