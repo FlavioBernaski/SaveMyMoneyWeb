@@ -52,7 +52,7 @@ const Login: React.FC = () => {
                 <Button type="primary" htmlType="submit" className="login-form-button">
                     Entrar
                 </Button>
-                Não tem uma conta? <Link to="cadastro">Cadastre-se agora!</Link>
+                Não tem uma conta? <Link to="/cadastro">Cadastre-se agora!</Link>
             </Form.Item>
         </Form>
     );

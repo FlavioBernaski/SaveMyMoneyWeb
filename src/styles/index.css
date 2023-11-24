@@ -12,6 +12,20 @@ code {
     monospace;
 }
 
+.cancel-button {
+  background-color: #f44336; /* Red background */
+  border: none;
+  color: white; /* White text */
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.cancel-button:hover {
+  background-color: #da190b; /* Darker red */
+  color: white !important; /* White text */
+}
+
 .content {
   padding: 10px;
   display: flex;
