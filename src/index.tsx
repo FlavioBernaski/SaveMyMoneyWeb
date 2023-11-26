@@ -5,7 +5,7 @@ import Login from './pages/Login';
 import reportWebVitals from './reportWebVitals';
 import {Button, ConfigProvider, Layout} from "antd";
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
-import Cadastro from "./pages/Cadastro";
+import Cadastro from "./pages/CadastroUsuario";
 import {Footer} from "antd/es/layout/layout";
 import Dashboard from "./pages/Dashboard";
 import App from "./App";

@@ -26,7 +26,7 @@ export const useApi = () => ({
         return response.data;
     },
     signin: async (usuario: Usuario) => {
-        const response = await api.post("/auth/cadastrar", usuario);
+        const response = await api.post("/auth/register", usuario);
         return response.data;
     },
     listarGastos: async () => {

@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {Route, Routes} from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
-import Cadastro from "./pages/Cadastro";
+import Cadastro from "./pages/CadastroUsuario";
 import {RequireAuth} from "./contexts/Auth/RequireAuth";
 import Cartoes from "./pages/Cartoes";
 

@@ -1,26 +1,32 @@
 import {Button, Form, Input, InputNumber, Modal, Table} from 'antd';
-import React, {MouseEventHandler, useEffect, useState} from 'react';
+import React, {MouseEventHandler, useContext, useEffect, useState} from 'react';
 import {Template} from "./Template";
 import {useApi} from "../hooks/useApi";
 import {Cartao} from "../types/Cartao";
 import {ColumnsType} from "antd/es/table";
 import {CloseOutlined, PlusOutlined, SaveOutlined} from "@ant-design/icons";
+import {AuthContext} from "../contexts/Auth/AuthContext";
+import {getUUID} from "../utils/uuid";
 
 const Cartoes: React.FC = () => {
     const api = useApi();
-
+    const auth = useContext(AuthContext);
     const [open, setOpen] = useState<boolean>(false)
     const [data, setData] = useState<Cartao[]>([])
     useEffect(() => {
+        atualizarLista()
+    }, []);
+
+    const atualizarLista = (): void => {
         api.listarCartoes()
             .then((data) => setData(data))
             .catch((err) => console.error(err.message));
-    }, [api]);
+    }
 
     const excluirCartao = (item: Cartao): MouseEventHandler => {
         return () => {
             api.excluirCartao(item.id)
-                .then(() => console.log("Excluido com sucesso"))
+                .then(() => atualizarLista())
                 .catch((err) => console.error(err.message));
         }
     }
@@ -46,7 +52,18 @@ const Cartoes: React.FC = () => {
     ]
 
     const cadastrar = (values: any) => {
-        console.log(values);
+        if (auth.usuario === null) return;
+        const item = values as Cartao;
+        item.id = getUUID();
+        item.usuario = auth.usuario;
+        item.ativo = true;
+        item.versao = Date.now();
+        api.cadastrarCartao(item)
+            .then(() => {
+                setOpen(false)
+                atualizarLista();
+            })
+            .catch((err) => console.error(err));
     }
 
     return (
@@ -72,20 +89,25 @@ const Cartoes: React.FC = () => {
                 }}>
                     <Form name={"formCadastroCartao"}
                           className={"cadastro-cartao"}
+                          requiredMark={false} layout={"vertical"}
                           onFinish={cadastrar}>
                         <Form.Item
-                            name={"nome"}
+                            label={'Nome do cartão'}
+                            name={"descricao"}
                             rules={[{required: true, message: 'Defina um nome para identificar seu cartão!'}]}>
                             <Input placeholder={'Apelido do cartão'}/>
                         </Form.Item>
                         <Form.Item
+                            label={'Limite'}
                             name={'limite'}
                             rules={[{required: true, message: 'Defina o limite do seu cartão!'}]}>
-                            <InputNumber
-                                controls={false}
-                                decimalSeparator={'.'}
-
-                            />
+                            <Input type={'number'} placeholder={'12.00'} prefix={"R$"}/>
+                        </Form.Item>
+                        <Form.Item
+                            label={'Dia de vencimento da fatura'}
+                            name={'vencimentoFatura'}
+                            rules={[{required: true, message: 'Defina quando o cartão irá virar!'}]}>
+                            <InputNumber min={1} max={31} defaultValue={1}/>
                         </Form.Item>
                     </Form>
                 </Modal>

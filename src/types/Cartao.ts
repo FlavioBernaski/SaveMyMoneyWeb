@@ -6,7 +6,8 @@ export class Cartao {
     versao: number;
     usuario: Usuario;
     descricao: string;
-    vencimentoFatura: Date;
+    vencimentoFatura: number;
+    limite: number;
 
     constructor() {
         this.id = '';
@@ -14,6 +15,7 @@ export class Cartao {
         this.versao = Date.now();
         this.usuario = new Usuario();
         this.descricao = '';
-        this.vencimentoFatura = new Date();
+        this.vencimentoFatura = 1;
+        this.limite = 0;
     }
 }

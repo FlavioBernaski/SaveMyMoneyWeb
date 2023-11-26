@@ -1,4 +1,4 @@
-import {Layout, Menu, MenuProps} from 'antd';
+import {Layout, Menu} from 'antd';
 import React, {useContext, useState} from 'react';
 import {CalendarOutlined, CreditCardOutlined, LogoutOutlined} from "@ant-design/icons";
 import {AuthContext} from "../contexts/Auth/AuthContext";
@@ -22,7 +22,7 @@ export const Template = ({children}: { children: JSX.Element }) => {
                    style={{overflow: "auto", height: "100hv", position: "fixed", left: 0, top: 0, bottom: 0}}>
                 <Menu theme={"dark"} mode={"inline"}>
                     <Menu.Item key={"1"} onClick={() => navigate("/")}>
-                        <CalendarOutlined />
+                        <CalendarOutlined/>
                         <span>Dashboard</span>
                     </Menu.Item>
                     <Menu.Item key={"2"} onClick={() => navigate("/cartoes")}>
