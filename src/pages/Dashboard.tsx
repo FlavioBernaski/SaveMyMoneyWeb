@@ -3,12 +3,12 @@ import React, {useEffect, useState} from 'react';
 import type {Dayjs} from 'dayjs';
 import {Template} from "./Template";
 import {useApi} from "../hooks/useApi";
-import {Gasto} from "../types/Gasto";
+import {Movimentacao} from "../types/Movimentacao";
 
 const Dashboard: React.FC = () => {
     const api = useApi();
 
-    const [listData, setListData] = useState<Gasto[]>([])
+    const [listData, setListData] = useState<Movimentacao[]>([])
     useEffect(() => {
         api.listarGastos()
             .then((data) => setListData(data))
@@ -28,7 +28,7 @@ const Dashboard: React.FC = () => {
     const dateCellRender = (value: Dayjs) => {
         let cell: React.ReactNode;
         var totalGasto: number = 0;
-        let filteredList: Gasto[] = listData.filter((data) => new Date(data.dataEntrada).toDateString() === value.toDate().toDateString())
+        let filteredList: Movimentacao[] = listData.filter((data) => new Date(data.dataEntrada).toDateString() === value.toDate().toDateString())
         filteredList.map((data) => {
             filteredList.forEach((i) => {
                 totalGasto += i.valor

@@ -30,7 +30,7 @@ export const useApi = () => ({
         return response.data;
     },
     listarGastos: async () => {
-        const response = await api.get("/gastos", authHeader);
+        const response = await api.get("/movimentacoes", authHeader);
         return response.data;
     },
     listarCartoes: async () => {

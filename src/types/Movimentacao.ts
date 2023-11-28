@@ -1,7 +1,7 @@
 import {Usuario} from "./Usuario";
 import {Cartao} from "./Cartao";
 
-export type Gasto = {
+export type Movimentacao = {
     id: string,
     ativo: boolean,
     versao: number,
@@ -10,5 +10,7 @@ export type Gasto = {
     valor: number,
     dataEntrada: Date,
     parcelas: number,
+    parcelaAtual: number,
+    tipo: 'S' | 'E',
     cartao: Cartao
 }
