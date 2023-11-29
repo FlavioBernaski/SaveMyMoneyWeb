@@ -10,7 +10,7 @@ const Dashboard: React.FC = () => {
 
     const [listData, setListData] = useState<Movimentacao[]>([])
     useEffect(() => {
-        api.listarGastos()
+        api.listarMovimentacoes()
             .then((data) => setListData(data))
             .catch((err) => console.error(err.message));
     }, []);
@@ -50,7 +50,7 @@ const Dashboard: React.FC = () => {
     }
 
     return (
-        <Template>
+        <Template templateKey={'dashboard'}>
             <div className={'content'}>
                 <Calendar cellRender={cellRender} style={{padding: "20px"}}/>
             </div>

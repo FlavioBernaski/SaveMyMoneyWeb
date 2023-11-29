@@ -29,7 +29,7 @@ export const useApi = () => ({
         const response = await api.post("/auth/register", usuario);
         return response.data;
     },
-    listarGastos: async () => {
+    listarMovimentacoes: async () => {
         const response = await api.get("/movimentacoes", authHeader);
         return response.data;
     },

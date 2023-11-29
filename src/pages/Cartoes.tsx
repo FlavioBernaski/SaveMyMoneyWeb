@@ -67,7 +67,7 @@ const Cartoes: React.FC = () => {
     }
 
     return (
-        <Template>
+        <Template templateKey={'cartoes'}>
             <div className={'content'}>
                 <span className={'title'}>Cartões</span>
                 <Button type={"primary"} icon={<PlusOutlined/>} onClick={() => setOpen(true)}

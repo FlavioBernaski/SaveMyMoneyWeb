@@ -12,6 +12,11 @@ code {
     monospace;
 }
 
+.layout-content {
+  padding: 0 50px;
+  margin: 16px 0;
+}
+
 .cancel-button {
   background-color: #f44336; /* Red background */
   border: none;
