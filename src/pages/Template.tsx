@@ -1,12 +1,12 @@
-import {Layout, Menu, MenuProps} from 'antd';
-import React, {useContext, useState} from 'react';
-import {CalendarOutlined, CreditCardOutlined, LogoutOutlined} from "@ant-design/icons";
+import {Avatar, Layout, Menu, MenuProps} from 'antd';
+import React, {useContext} from 'react';
+import {CalendarOutlined, CreditCardOutlined, LogoutOutlined, UserOutlined} from "@ant-design/icons";
 import {AuthContext} from "../contexts/Auth/AuthContext";
 import {useNavigate} from "react-router-dom";
 
 const {Header, Content, Footer} = Layout;
 
-export const Template = ({templateKey ,children}: { templateKey: any, children: JSX.Element }) => {
+export const Template = ({templateKey, children}: { templateKey: any, children: JSX.Element }) => {
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -43,9 +43,11 @@ export const Template = ({templateKey ,children}: { templateKey: any, children: 
     }
 
     return (
-        <Layout>
+        <Layout className={'layout'}>
             <Header className={"layout-header"}>
-                <Menu theme={"dark"} mode={"horizontal"} items={items} onClick={onClick} selectedKeys={[templateKey]}/>
+                <Menu theme={"dark"} mode={"horizontal"} items={items} style={{minWidth: '500px'}} onClick={onClick}
+                      defaultSelectedKeys={[templateKey]}/>
+                <Avatar icon={<UserOutlined/>}></Avatar>
             </Header>
             <Content className={'layout-content'}>
                 {children}

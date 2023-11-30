@@ -12,6 +12,12 @@ code {
     monospace;
 }
 
+.layout-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .layout-content {
   padding: 0 50px;
   margin: 16px 0;
