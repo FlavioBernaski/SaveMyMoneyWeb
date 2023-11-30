@@ -1,19 +1,32 @@
-import {Badge, Calendar, CalendarProps} from 'antd';
+import {Badge, Calendar, CalendarProps, Card, Col, Row} from 'antd';
 import React, {useEffect, useState} from 'react';
 import type {Dayjs} from 'dayjs';
 import {Template} from "./Template";
 import {useApi} from "../hooks/useApi";
 import {Movimentacao} from "../types/Movimentacao";
+import {Conta} from "../types/Conta";
 
 const Dashboard: React.FC = () => {
     const api = useApi();
 
-    const [listData, setListData] = useState<Movimentacao[]>([])
+    const [contas, setContas] = useState<Conta[]>([]);
+    const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([])
     useEffect(() => {
-        api.listarMovimentacoes()
-            .then((data) => setListData(data))
-            .catch((err) => console.error(err.message));
+        atualizarListaMovimentacoes();
+        atualizarListaContas()
     }, []);
+
+    const atualizarListaMovimentacoes = (): void => {
+        api.listarMovimentacoes()
+            .then((data) => setMovimentacoes(data))
+            .catch((err) => console.error(err.message));
+    }
+
+    const atualizarListaContas = (): void => {
+        api.listarContas()
+            .then((data) => setContas(data))
+            .catch((err) => console.error(err.message));
+    }
 
     const monthCellRender = (value: Dayjs) => {
         const num = value.get("month");
@@ -28,13 +41,13 @@ const Dashboard: React.FC = () => {
     const dateCellRender = (value: Dayjs) => {
         let cell: React.ReactNode;
         var totalGasto: number = 0;
-        let filteredList: Movimentacao[] = listData.filter((data) => new Date(data.dataEntrada).toDateString() === value.toDate().toDateString())
+        let filteredList: Movimentacao[] = movimentacoes.filter((data) => new Date(data.dataEntrada).toDateString() === value.toDate().toDateString())
         filteredList.map((data) => {
             filteredList.forEach((i) => {
                 totalGasto += i.valor
             })
             cell = (<ul className="events" title={"R$" + totalGasto.toFixed(2)}>
-                {listData.map((item) => (
+                {movimentacoes.map((item) => (
                     <li key={item.id}>
                         <Badge status={'success'} text={item.descricao}/>
                     </li>
@@ -51,9 +64,20 @@ const Dashboard: React.FC = () => {
 
     return (
         <Template templateKey={'dashboard'}>
-            <div className={'content'}>
-                <Calendar cellRender={cellRender} style={{padding: "20px"}}/>
-            </div>
+            <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
+                <Col span={'18'}>
+                    <Calendar cellRender={cellRender} style={{padding: "20px"}}/>
+                </Col>
+                <Col span={'6'}>
+                    <Card title={'Saldo'}>
+                        {contas.map(item => (
+                            <div>
+                                <p>{item.descricao} - Saldo {item.saldo}</p>
+                            </div>
+                        ))}
+                    </Card>
+                </Col>
+            </Row>
         </Template>
     );
 }

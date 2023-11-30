@@ -1,21 +1,19 @@
-import {Conta} from "./Conta";
+import {Usuario} from "./Usuario";
 
-export class Cartao {
+export class Conta {
     id: string;
     ativo: boolean;
     versao: number;
-    conta: Conta;
+    usuario: Usuario;
     descricao: string;
-    vencimentoFatura: number;
-    limite: number;
+    saldo: number;
 
     constructor() {
         this.id = '';
         this.ativo = true;
         this.versao = Date.now();
-        this.conta = new Conta();
+        this.usuario = new Usuario();
         this.descricao = '';
-        this.vencimentoFatura = 1;
-        this.limite = 0;
+        this.saldo = 0;
     }
 }

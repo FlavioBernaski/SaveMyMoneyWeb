@@ -1,13 +1,13 @@
+import {Cartao} from "./Cartao";
 import {Conta} from "./Conta";
 
-export class Cartao {
+export class Renda {
     id: string;
     ativo: boolean;
     versao: number;
     conta: Conta;
     descricao: string;
-    vencimentoFatura: number;
-    limite: number;
+    valor: number;
 
     constructor() {
         this.id = '';
@@ -15,7 +15,6 @@ export class Cartao {
         this.versao = Date.now();
         this.conta = new Conta();
         this.descricao = '';
-        this.vencimentoFatura = 1;
-        this.limite = 0;
+        this.valor = 0;
     }
 }

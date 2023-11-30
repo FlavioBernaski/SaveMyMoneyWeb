@@ -1,4 +1,4 @@
-import {Button, Form, Input, InputNumber, Modal, Table} from 'antd';
+import {Button, Form, Input, InputNumber, Modal, Select, Table} from 'antd';
 import React, {MouseEventHandler, useContext, useEffect, useState} from 'react';
 import {Template} from "./Template";
 import {useApi} from "../hooks/useApi";
@@ -7,26 +7,35 @@ import {ColumnsType} from "antd/es/table";
 import {CloseOutlined, PlusOutlined, SaveOutlined} from "@ant-design/icons";
 import {AuthContext} from "../contexts/Auth/AuthContext";
 import {getUUID} from "../utils/uuid";
+import {Conta} from "../types/Conta";
 
 const Cartoes: React.FC = () => {
     const api = useApi();
     const auth = useContext(AuthContext);
+    const [contas, setContas] = useState<Conta[]>([]);
     const [open, setOpen] = useState<boolean>(false)
-    const [data, setData] = useState<Cartao[]>([])
+    const [cartoes, setCartoes] = useState<Cartao[]>([])
     useEffect(() => {
-        atualizarLista()
+        atualizarListaCartoes();
+        atualizarListaContas();
     }, []);
 
-    const atualizarLista = (): void => {
+    const atualizarListaCartoes = (): void => {
         api.listarCartoes()
-            .then((data) => setData(data))
+            .then((data) => setCartoes(data))
+            .catch((err) => console.error(err.message));
+    }
+
+    const atualizarListaContas = (): void => {
+        api.listarContas()
+            .then((data) => setContas(data))
             .catch((err) => console.error(err.message));
     }
 
     const excluirCartao = (item: Cartao): MouseEventHandler => {
         return () => {
             api.excluirCartao(item.id)
-                .then(() => atualizarLista())
+                .then(() => atualizarListaCartoes())
                 .catch((err) => console.error(err.message));
         }
     }
@@ -43,6 +52,14 @@ const Cartoes: React.FC = () => {
             key: 'venc'
         },
         {
+            title: 'Limite',
+            dataIndex: 'limite',
+            key: 'limite',
+            render: (_, item) => (
+                <span>{'R$ '.concat(item.limite.toFixed(2))}</span>
+            )
+        },
+        {
             title: '',
             key: 'actions',
             render: (_, item) => (
@@ -51,17 +68,17 @@ const Cartoes: React.FC = () => {
         }
     ]
 
-    const cadastrar = (values: any) => {
+    const cadastrar = async (values: any) => {
         if (auth.usuario === null) return;
         const item = values as Cartao;
         item.id = getUUID();
-        item.usuario = auth.usuario;
+        item.conta = await api.localizarConta(values.idConta)
         item.ativo = true;
         item.versao = Date.now();
         api.cadastrarCartao(item)
             .then(() => {
                 setOpen(false)
-                atualizarLista();
+                atualizarListaCartoes();
             })
             .catch((err) => console.error(err));
     }
@@ -72,7 +89,7 @@ const Cartoes: React.FC = () => {
                 <span className={'title'}>Cartões</span>
                 <Button type={"primary"} icon={<PlusOutlined/>} onClick={() => setOpen(true)}
                         style={{float: "right"}}>Novo</Button>
-                <Table columns={columns} dataSource={data}/>
+                <Table columns={columns} dataSource={cartoes}/>
                 <Modal open={open} title={"Cadastro de cartão"} footer={[
                     <Button id={'cancel'} className={'cancel-button'} type={"default"} htmlType={"reset"}
                             form={'formCadastroCartao'} icon={<CloseOutlined/>} onClick={() => setOpen(false)}>
@@ -91,6 +108,18 @@ const Cartoes: React.FC = () => {
                           className={"cadastro-cartao"}
                           requiredMark={false} layout={"vertical"}
                           onFinish={cadastrar}>
+                        <Form.Item
+                            label={'Conta'}
+                            name={"idConta"}
+                            rules={[{required: true, message: 'Defina a conta do seu cartão!'}]}>
+                            <Select placeholder={'Conta'} options={
+                                new Array(contas.length).fill(null).map((_, index) => {
+                                    return {
+                                        value: contas[index].id,
+                                        label: contas[index].descricao
+                                    }
+                            })} />
+                        </Form.Item>
                         <Form.Item
                             label={'Nome do cartão'}
                             name={"descricao"}
