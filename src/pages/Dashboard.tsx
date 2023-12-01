@@ -1,4 +1,4 @@
-import {Badge, Calendar, CalendarProps, Card, Col, Row} from 'antd';
+import {Badge, Calendar, CalendarProps, Card, Col, Collapse, Row} from 'antd';
 import React, {useEffect, useState} from 'react';
 import type {Dayjs} from 'dayjs';
 import {Template} from "./Template";
@@ -41,13 +41,16 @@ const Dashboard: React.FC = () => {
     const dateCellRender = (value: Dayjs) => {
         let cell: React.ReactNode;
         var totalGasto: number = 0;
-        let filteredList: Movimentacao[] = movimentacoes.filter((data) => new Date(data.dataEntrada).toDateString() === value.toDate().toDateString())
+        let filteredList: Movimentacao[] = movimentacoes.filter(
+            (data) => new Date(data.dataEntrada).toDateString() === value.toDate().toDateString())
+        console.log(movimentacoes);
+        console.log(filteredList);
         filteredList.map((data) => {
             filteredList.forEach((i) => {
                 totalGasto += i.valor
             })
             cell = (<ul className="events" title={"R$" + totalGasto.toFixed(2)}>
-                {movimentacoes.map((item) => (
+                {filteredList.map((item) => (
                     <li key={item.id}>
                         <Badge status={'success'} text={item.descricao}/>
                     </li>
@@ -62,19 +65,29 @@ const Dashboard: React.FC = () => {
         return info.originNode;
     }
 
+    const abrirDialogData = () => {
+
+    };
+
     return (
         <Template templateKey={'dashboard'}>
             <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
                 <Col span={'18'}>
-                    <Calendar cellRender={cellRender} style={{padding: "20px"}}/>
+                    <Calendar cellRender={cellRender} onSelect={abrirDialogData} style={{padding: "20px"}}/>
                 </Col>
                 <Col span={'6'}>
                     <Card title={'Saldo'}>
-                        {contas.map(item => (
-                            <div>
-                                <p>{item.descricao} - Saldo {item.saldo}</p>
-                            </div>
-                        ))}
+                        <Collapse accordion={true} items={contas.map((item, index) => (
+                            {
+                                key: index,
+                                label: item.descricao,
+                                children: movimentacoes.filter(m => m.conta.id === item.id).map(
+                                    movimentacao => (
+                                        <p>{movimentacao.descricao} - R$ {movimentacao.valor.toFixed(2)}</p>
+                                    )
+                                )
+                            }
+                        ))}/>
                     </Card>
                 </Col>
             </Row>

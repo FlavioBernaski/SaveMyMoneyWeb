@@ -61,5 +61,9 @@ export const useApi = () => ({
     localizarConta: async (idConta: string) => {
         const response = await api.get('/contas/' + idConta, authHeader);
         return response.data;
+    },
+    excluirConta: async (id: string) => {
+        const response = await api.delete("/contas/" + id, authHeader);
+        return response.data;
     }
 })

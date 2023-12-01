@@ -1,6 +1,12 @@
-import {Avatar, Layout, Menu, MenuProps} from 'antd';
+import {Layout, Menu, MenuProps} from 'antd';
 import React, {useContext} from 'react';
-import {CalendarOutlined, CreditCardOutlined, LogoutOutlined, UserOutlined} from "@ant-design/icons";
+import {
+    CalendarOutlined,
+    CreditCardOutlined,
+    LogoutOutlined,
+    MoneyCollectOutlined,
+    UserOutlined
+} from "@ant-design/icons";
 import {AuthContext} from "../contexts/Auth/AuthContext";
 import {useNavigate} from "react-router-dom";
 
@@ -22,6 +28,16 @@ export const Template = ({templateKey, children}: { templateKey: any, children: 
             icon: <CreditCardOutlined/>
         },
         {
+            label: 'Contas',
+            key: 'contas',
+            icon: <MoneyCollectOutlined/>
+        },
+        {
+            label: 'Usuário',
+            key: 'usuario',
+            icon: <UserOutlined/>
+        },
+        {
             label: 'Sair',
             key: 'sair',
             icon: <LogoutOutlined/>
@@ -39,15 +55,21 @@ export const Template = ({templateKey, children}: { templateKey: any, children: 
             case 'dashboard':
                 navigate('/');
                 break;
+            case 'contas':
+                navigate('/contas');
+                break;
+            case 'rendas':
+                navigate('/rendas');
+                break;
         }
     }
 
     return (
         <Layout className={'layout'}>
             <Header className={"layout-header"}>
-                <Menu theme={"dark"} mode={"horizontal"} items={items} style={{minWidth: '500px'}} onClick={onClick}
+                <Menu theme={"dark"} mode={"horizontal"} items={items} style={{minWidth: '900px'}} onClick={onClick}
                       defaultSelectedKeys={[templateKey]}/>
-                <Avatar icon={<UserOutlined/>}></Avatar>
+                <span className={'usuario-logado'}>Logado como {auth.usuario?.nome}</span>
             </Header>
             <Content className={'layout-content'}>
                 {children}
