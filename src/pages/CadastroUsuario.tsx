@@ -23,7 +23,7 @@ const Login: React.FC = () => {
         novo.versao = Date.now();
         const response = await api.signin(novo);
         if (response) {
-            auth.signin(values.email, values.senha);
+            await auth.signin(values.email, values.senha);
             navigate("/")
         }
     };

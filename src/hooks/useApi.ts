@@ -2,6 +2,7 @@ import axios from 'axios';
 import {Usuario} from "../types/Usuario";
 import {Cartao} from "../types/Cartao";
 import {Conta} from "../types/Conta";
+import {useMemo} from "react";
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API
@@ -17,7 +18,7 @@ const authHeader = {
     }
 }
 
-export const useApi = () => ({
+export const useApi = () => useMemo(() => ({
     // Autorizações
     validarToken: async (token: string): Promise<any> => {
         const response = await api.post("/auth/validate", {token});
@@ -66,4 +67,4 @@ export const useApi = () => ({
         const response = await api.delete("/contas/" + id, authHeader);
         return response.data;
     }
-})
+}), []); // Fecha useMemo

@@ -1,5 +1,5 @@
 import {Button, Form, Input, InputNumber, Modal, Select, Table} from 'antd';
-import React, {MouseEventHandler, useContext, useEffect, useState} from 'react';
+import React, {MouseEventHandler, useCallback, useContext, useEffect, useState} from 'react';
 import {Template} from "./Template";
 import {useApi} from "../hooks/useApi";
 import {Cartao} from "../types/Cartao";
@@ -15,22 +15,23 @@ const Cartoes: React.FC = () => {
     const [contas, setContas] = useState<Conta[]>([]);
     const [open, setOpen] = useState<boolean>(false)
     const [cartoes, setCartoes] = useState<Cartao[]>([])
-    useEffect(() => {
-        atualizarListaCartoes();
-        atualizarListaContas();
-    }, []);
 
-    const atualizarListaCartoes = (): void => {
+    const atualizarListaCartoes = useCallback(() => {
         api.listarCartoes()
             .then((data) => setCartoes(data))
             .catch((err) => console.error(err.message));
-    }
+    }, [api])
 
-    const atualizarListaContas = (): void => {
+    const atualizarListaContas = useCallback(() => {
         api.listarContas()
             .then((data) => setContas(data))
             .catch((err) => console.error(err.message));
-    }
+    }, [api])
+
+    useEffect(() => {
+        atualizarListaCartoes();
+        atualizarListaContas();
+    }, [atualizarListaCartoes, atualizarListaContas]);
 
     const excluirCartao = (item: Cartao): MouseEventHandler => {
         return () => {
@@ -83,6 +84,59 @@ const Cartoes: React.FC = () => {
             .catch((err) => console.error(err));
     }
 
+    const dialogCadastroCartoes = (
+        <Modal open={open} title={"Cadastro de cartão"} footer={[
+            <Button id={'cancel'} className={'cancel-button'} type={"default"} htmlType={"reset"}
+                    form={'formCadastroCartao'} icon={<CloseOutlined/>} onClick={() => setOpen(false)}>
+                Cancelar
+            </Button>,
+            <Button id={'save'} type={"primary"} htmlType={"submit"} form={'formCadastroCartao'}
+                    icon={<SaveOutlined/>}>
+                Salvar
+            </Button>,
+        ]} onCancel={() => {
+            let button = document.getElementById('cancel');
+            if (button) button.click();
+            else setOpen(false);
+        }}>
+            <Form name={"formCadastroCartao"}
+                  className={"cadastro-cartao"}
+                  requiredMark={false} layout={"vertical"}
+                  onFinish={cadastrar}>
+                <Form.Item
+                    label={'Conta'}
+                    name={"idConta"}
+                    rules={[{required: true, message: 'Defina a conta do seu cartão!'}]}>
+                    <Select placeholder={'Conta'} options={
+                        new Array(contas.length).fill(null).map((_, index) => {
+                            return {
+                                value: contas[index].id,
+                                label: contas[index].descricao
+                            }
+                        })} />
+                </Form.Item>
+                <Form.Item
+                    label={'Nome do cartão'}
+                    name={"descricao"}
+                    rules={[{required: true, message: 'Defina um nome para identificar seu cartão!'}]}>
+                    <Input placeholder={'Apelido do cartão'}/>
+                </Form.Item>
+                <Form.Item
+                    label={'Limite'}
+                    name={'limite'}
+                    rules={[{required: true, message: 'Defina o limite do seu cartão!'}]}>
+                    <Input type={'number'} placeholder={'12.00'} prefix={"R$"}/>
+                </Form.Item>
+                <Form.Item
+                    label={'Dia de vencimento da fatura'}
+                    name={'vencimentoFatura'}
+                    rules={[{required: true, message: 'Defina quando o cartão irá virar!'}]}>
+                    <InputNumber min={1} max={31} defaultValue={1}/>
+                </Form.Item>
+            </Form>
+        </Modal>
+    );
+
     return (
         <Template templateKey={'cartoes'}>
             <div className={'content'}>
@@ -90,56 +144,7 @@ const Cartoes: React.FC = () => {
                 <Button type={"primary"} icon={<PlusOutlined/>} onClick={() => setOpen(true)}
                         style={{float: "right"}}>Novo</Button>
                 <Table columns={columns} dataSource={cartoes}/>
-                <Modal open={open} title={"Cadastro de cartão"} footer={[
-                    <Button id={'cancel'} className={'cancel-button'} type={"default"} htmlType={"reset"}
-                            form={'formCadastroCartao'} icon={<CloseOutlined/>} onClick={() => setOpen(false)}>
-                        Cancelar
-                    </Button>,
-                    <Button id={'save'} type={"primary"} htmlType={"submit"} form={'formCadastroCartao'}
-                            icon={<SaveOutlined/>}>
-                        Salvar
-                    </Button>,
-                ]} onCancel={() => {
-                    let button = document.getElementById('cancel');
-                    if (button) button.click();
-                    else setOpen(false);
-                }}>
-                    <Form name={"formCadastroCartao"}
-                          className={"cadastro-cartao"}
-                          requiredMark={false} layout={"vertical"}
-                          onFinish={cadastrar}>
-                        <Form.Item
-                            label={'Conta'}
-                            name={"idConta"}
-                            rules={[{required: true, message: 'Defina a conta do seu cartão!'}]}>
-                            <Select placeholder={'Conta'} options={
-                                new Array(contas.length).fill(null).map((_, index) => {
-                                    return {
-                                        value: contas[index].id,
-                                        label: contas[index].descricao
-                                    }
-                            })} />
-                        </Form.Item>
-                        <Form.Item
-                            label={'Nome do cartão'}
-                            name={"descricao"}
-                            rules={[{required: true, message: 'Defina um nome para identificar seu cartão!'}]}>
-                            <Input placeholder={'Apelido do cartão'}/>
-                        </Form.Item>
-                        <Form.Item
-                            label={'Limite'}
-                            name={'limite'}
-                            rules={[{required: true, message: 'Defina o limite do seu cartão!'}]}>
-                            <Input type={'number'} placeholder={'12.00'} prefix={"R$"}/>
-                        </Form.Item>
-                        <Form.Item
-                            label={'Dia de vencimento da fatura'}
-                            name={'vencimentoFatura'}
-                            rules={[{required: true, message: 'Defina quando o cartão irá virar!'}]}>
-                            <InputNumber min={1} max={31} defaultValue={1}/>
-                        </Form.Item>
-                    </Form>
-                </Modal>
+                {dialogCadastroCartoes}
             </div>
         </Template>
     );

@@ -74,6 +74,9 @@ export const Template = ({templateKey, children}: { templateKey: any, children: 
             <Content className={'layout-content'}>
                 {children}
             </Content>
+            <Footer className={'layout-footer'}>
+                Criado por Flávio Bernaski
+            </Footer>
         </Layout>
     );
 }
