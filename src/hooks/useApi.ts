@@ -42,6 +42,10 @@ export const useApi = () => useMemo(() => ({
         const response = await api.get("/cartoes", authHeader);
         return response.data;
     },
+    listarCartoesPorConta: async (idConta: string) => {
+        const response = await api.get("/cartoes/conta/" + idConta, authHeader);
+        return response.data;
+    },
     excluirCartao: async (id: string) => {
         const response = await api.delete("/cartoes/" + id, authHeader);
         return response.data;
