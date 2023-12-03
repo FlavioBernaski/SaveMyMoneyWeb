@@ -3,6 +3,7 @@ import {Usuario} from "../types/Usuario";
 import {Cartao} from "../types/Cartao";
 import {Conta} from "../types/Conta";
 import {useMemo} from "react";
+import {Movimentacao} from "../types/Movimentacao";
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API
@@ -37,6 +38,10 @@ export const useApi = () => useMemo(() => ({
         const response = await api.get("/movimentacoes", authHeader);
         return response.data;
     },
+    cadastrarMovimentacao: async (movimentacao: Movimentacao) => {
+        const response = await api.post('/movimentacoes', movimentacao, authHeader);
+        return response.data;
+    },
     // Cartões
     listarCartoes: async () => {
         const response = await api.get("/cartoes", authHeader);
@@ -52,6 +57,10 @@ export const useApi = () => useMemo(() => ({
     },
     cadastrarCartao: async (cartao: Cartao) => {
         const response = await api.post("/cartoes", cartao, authHeader);
+        return response.data;
+    },
+    localizarCartao: async (idCartao: string) => {
+        const response = await api.get('/cartoes/' + idCartao, authHeader);
         return response.data;
     },
     // Contas

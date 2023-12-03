@@ -78,7 +78,7 @@ const Cartoes: React.FC = () => {
         item.versao = Date.now();
         api.cadastrarCartao(item)
             .then(() => {
-                setOpen(false)
+                setOpen(false);
                 atualizarListaCartoes();
             })
             .catch((err) => console.error(err));

@@ -25,6 +25,7 @@ import {Conta} from "../types/Conta";
 import {SelectInfo} from "antd/es/calendar/generateCalendar";
 import {CloseOutlined, PlusOutlined, SaveOutlined} from "@ant-design/icons";
 import {Cartao} from "../types/Cartao";
+import {getUUID} from "../utils/uuid";
 
 const Dashboard: React.FC = () => {
     const api = useApi();
@@ -75,7 +76,7 @@ const Dashboard: React.FC = () => {
         cell = (<ul className="events" title={"R$" + totalGasto.toFixed(2)}>
             {filteredList.map((item) => (
                 <li key={item.id}>
-                    <Badge status={'success'} text={item.descricao}/>
+                    <Badge status={item.tipo === 'E' ? 'success' : 'error'} text={item.descricao}/>
                 </li>
             ))}
         </ul>)
@@ -92,16 +93,35 @@ const Dashboard: React.FC = () => {
         setVerDetalheDia(true)
     };
 
-    const cadastrarMovimentacao = (values: any) => {
-        console.log(values);
+    const cadastrarMovimentacao = async (values: any) => {
+        const item = values as Movimentacao;
+        item.id = getUUID();
+        item.conta = await api.localizarConta(values.idConta);
+        item.ativo = true;
+        item.versao = Date.now();
+        if (values.idCartao) {
+            item.cartao = await api.localizarCartao(values.idCartao);
+        }
+        api.cadastrarMovimentacao(item)
+            .then(() => {
+                setVerCadastroMovimentacao(false);
+                atualizarListaMovimentacoes();
+            })
+            .catch((err) => console.error(err));
     };
+
+    const fecharCadastroMovimentacao = () => {
+        setVerCadastroMovimentacao(false)
+        setCartoes([]);
+        setCompraAVista(true);
+    }
 
     const dialogCadastroMovimentacao = (
         <Modal open={verCadastroMovimentacao} title={'Cadastrar nova movimentação'} footer={[
             <Button key={'cancel'} id={'cancel-cadastro-movimentacao'} className={'cancel-button'} type={"default"}
                     htmlType={"reset"}
                     form={'formCadastroMovimentacao'} icon={<CloseOutlined/>}
-                    onClick={() => setVerCadastroMovimentacao(false)}>
+                    onClick={fecharCadastroMovimentacao}>
                 Cancelar
             </Button>,
             <Button key={'save'} id={'save'} type={"primary"} htmlType={"submit"} form={'formCadastroMovimentacao'}
@@ -111,11 +131,20 @@ const Dashboard: React.FC = () => {
         ]} onCancel={() => {
             let button = document.getElementById('cancel-cadastro-movimentacao');
             if (button) button.click();
-            else setVerCadastroMovimentacao(false);
+            else fecharCadastroMovimentacao();
         }}>
             <Form name={'formCadastroMovimentacao'}
                   requiredMark={false} layout={"vertical"}
                   onFinish={cadastrarMovimentacao}>
+                <Form.Item
+                    label={''}
+                    initialValue={'E'}
+                    name={'tipo'}>
+                    <Radio.Group optionType={'button'} buttonStyle={"solid"}>
+                        <Radio value={'E'}>Entrada</Radio>
+                        <Radio value={'S'}>Saída</Radio>
+                    </Radio.Group>
+                </Form.Item>
                 <Form.Item
                     label={'Conta'}
                     name={'idConta'}
@@ -140,6 +169,13 @@ const Dashboard: React.FC = () => {
                     <Input placeholder={'Descrição da movimentação'}/>
                 </Form.Item>
                 <Form.Item
+                    label={'Valor'}
+                    name={"valor"}
+                    initialValue={0}
+                    rules={[{required: true, message: 'Defina o valor da movimentação!'}]}>
+                    <InputNumber prefix={'R$'} placeholder={'Descrição da movimentação'}/>
+                </Form.Item>
+                <Form.Item
                     label={'Data da movimentação'}
                     name={"dataEntrada"}
                     rules={[{required: true, message: 'Defina a data da movimentação!'}]}>
@@ -153,9 +189,9 @@ const Dashboard: React.FC = () => {
                     <div style={{marginTop: '14px'}}>
                         <Form.Item
                             label={'Parcelas'}
-                            name={'parcelas'}>
-                            <InputNumber id={'idInput'} placeholder={'Número de parcelas da compra'} defaultValue={1}
-                                         min={1}/>
+                            name={'parcelas'}
+                            initialValue={1}>
+                            <InputNumber id={'idInput'} placeholder={'Número de parcelas da compra'} min={1}/>
                         </Form.Item>
                         <Form.Item
                             label={'Cartão'}
@@ -216,9 +252,6 @@ const Dashboard: React.FC = () => {
     )
 
     const abrirCadastroMovimentacao = async () => {
-        await api.listarCartoes()
-            .then(value => setCartoes(value))
-            .catch((err) => console.error(err));
         setVerCadastroMovimentacao(true);
     }
 
