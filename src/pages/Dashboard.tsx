@@ -89,8 +89,10 @@ const Dashboard: React.FC = () => {
     }
 
     const abrirDialogData = (date: Dayjs, info: SelectInfo) => {
-        setDiaSelecionado(date);
-        setVerDetalheDia(true)
+        if (info.source === 'date') {
+            setDiaSelecionado(date);
+            setVerDetalheDia(true);
+        }
     };
 
     const cadastrarMovimentacao = async (values: any) => {
@@ -138,11 +140,11 @@ const Dashboard: React.FC = () => {
                   onFinish={cadastrarMovimentacao}>
                 <Form.Item
                     label={''}
-                    initialValue={'E'}
+                    initialValue={'S'}
                     name={'tipo'}>
                     <Radio.Group optionType={'button'} buttonStyle={"solid"}>
-                        <Radio value={'E'}>Entrada</Radio>
                         <Radio value={'S'}>Saída</Radio>
+                        <Radio value={'E'}>Entrada</Radio>
                     </Radio.Group>
                 </Form.Item>
                 <Form.Item

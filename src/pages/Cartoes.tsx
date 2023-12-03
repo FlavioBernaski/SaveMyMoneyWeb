@@ -53,6 +53,14 @@ const Cartoes: React.FC = () => {
             key: 'venc'
         },
         {
+            title: 'Conta',
+            dataIndex: 'conta',
+            key: 'conta',
+            render: (_, item) => (
+                <span>{item.conta.descricao}</span>
+            )
+        },
+        {
             title: 'Limite',
             dataIndex: 'limite',
             key: 'limite',
@@ -130,8 +138,9 @@ const Cartoes: React.FC = () => {
                 <Form.Item
                     label={'Dia de vencimento da fatura'}
                     name={'vencimentoFatura'}
+                    initialValue={1}
                     rules={[{required: true, message: 'Defina quando o cartão irá virar!'}]}>
-                    <InputNumber min={1} max={31} defaultValue={1}/>
+                    <InputNumber min={1} max={31}/>
                 </Form.Item>
             </Form>
         </Modal>
