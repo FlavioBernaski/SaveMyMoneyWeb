@@ -1,10 +1,9 @@
-import {Button, Form, Input, InputNumber, Modal, Select, Table} from 'antd';
+import {Button, Form, Input, Modal, Popconfirm, Table} from 'antd';
 import React, {MouseEventHandler, useCallback, useContext, useEffect, useState} from 'react';
 import {Template} from "./Template";
 import {useApi} from "../hooks/useApi";
-import {Cartao} from "../types/Cartao";
 import {ColumnsType} from "antd/es/table";
-import {CloseOutlined, PlusOutlined, SaveOutlined} from "@ant-design/icons";
+import {CloseOutlined, DeleteOutlined, PlusOutlined, SaveOutlined} from "@ant-design/icons";
 import {AuthContext} from "../contexts/Auth/AuthContext";
 import {getUUID} from "../utils/uuid";
 import {Conta} from "../types/Conta";
@@ -50,8 +49,14 @@ const Contas: React.FC = () => {
         {
             title: '',
             key: 'actions',
+            dataIndex: 'actions',
             render: (_, item) => (
-                <span onClick={excluirConta(item)}>Excluir</span>
+                <Popconfirm title={"Exclusão de conta"}
+                            description={'Deseja mesmo excluir esse item?'}
+                            okText={'Sim'}
+                            onConfirm={() => excluirConta(item)}>
+                    <Button icon={<DeleteOutlined/>} className={'cancel-button'}>Excluir</Button>
+                </Popconfirm>
             )
         }
     ]

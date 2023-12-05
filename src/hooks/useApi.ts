@@ -57,6 +57,10 @@ export const useApi = () => useMemo(() => ({
         const response = await api.post('/movimentacoes', movimentacao, getHeader());
         return response.data;
     },
+    excluirMovimentacao: async (id: string) => {
+        const response = await api.delete("/movimentacoes/" + id, getHeader());
+        return response.data;
+    },
     // Cartões
     listarCartoes: async () => {
         const response = await api.get("/cartoes", getHeader());

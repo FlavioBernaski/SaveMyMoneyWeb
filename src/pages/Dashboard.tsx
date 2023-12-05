@@ -11,6 +11,7 @@ import {
     Input,
     InputNumber,
     Modal,
+    Popconfirm,
     Radio,
     Row,
     Select,
@@ -25,7 +26,7 @@ import {useApi} from "../hooks/useApi";
 import {Movimentacao} from "../types/Movimentacao";
 import {Conta} from "../types/Conta";
 import {CalendarMode, SelectInfo} from "antd/es/calendar/generateCalendar";
-import {CloseOutlined, PlusOutlined, SaveOutlined} from "@ant-design/icons";
+import {CloseOutlined, DeleteOutlined, PlusOutlined, SaveOutlined} from "@ant-design/icons";
 import {Cartao} from "../types/Cartao";
 import {getUUID} from "../utils/uuid";
 import "dayjs/plugin/localeData";
@@ -40,11 +41,11 @@ const Dashboard: React.FC = () => {
     const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([]);
     const [verDetalheDia, setVerDetalheDia] = useState<boolean>(false);
     const [verCadastroMovimentacao, setVerCadastroMovimentacao] = useState<boolean>(false);
-    const [diaSelecionado, setDiaSelecionado] = useState<Dayjs | undefined>(undefined);
     const [compraAVista, setCompraAVista] = useState<boolean>(true);
-    const [cartoes, setCartoes] = useState<Cartao[]>([])
-    const [mesSelecionado, setMesSelecionado] = useState<number>(dayjs().month())
-    const [anoSelecionado, setAnoSelecionado] = useState<number>(dayjs().year())
+    const [cartoes, setCartoes] = useState<Cartao[]>([]);
+    const [diaSelecionado, setDiaSelecionado] = useState<Dayjs | undefined>(undefined);
+    const [mesSelecionado, setMesSelecionado] = useState<number>(dayjs().month());
+    const [anoSelecionado, setAnoSelecionado] = useState<number>(dayjs().year());
 
     const atualizarListaMovimentacoes = useCallback(() => {
         api.listarMovimentacoesFiltroAnoMes(anoSelecionado, mesSelecionado)
@@ -205,7 +206,8 @@ const Dashboard: React.FC = () => {
                         </Form.Item>
                         <Form.Item
                             label={'Cartão'}
-                            name={'idCartao'}>
+                            name={'idCartao'}
+                            rules={[{required: true, message: "O cartão deve ser selecionado em compras a prazo"}]}>
                             <Select placeholder={'Cartão'} options={
                                 new Array(cartoes.length).fill(null).map((_, index) => {
                                     return {
@@ -230,8 +232,20 @@ const Dashboard: React.FC = () => {
                             .filter(m =>
                                 new Date(m.dataEntrada).toDateString() === diaSelecionado?.toDate().toDateString())
                             .map((value, index) => (
-                                <li key={index}>
-                                    <span>{value.descricao}</span>
+                                <li key={index} style={{display: 'flex', alignItems: 'center'}}>
+                                    <span>{value.descricao}: R${value.valor.toFixed(2)}</span>
+                                    <Popconfirm title={"Exclusão de movimentação"}
+                                                description={'Deseja mesmo excluir esse item?'}
+                                                okText={'Sim'}
+                                                onConfirm={() => {
+                                                    api.excluirMovimentacao(value.id)
+                                                        .then(() => atualizarListaMovimentacoes());
+                                                }}
+                                                cancelText={'Não'}>
+                                        <Button className={'cancel-button'}
+                                                icon={<DeleteOutlined/>}
+                                                style={{marginLeft: 10}}>Excluir</Button>
+                                    </Popconfirm>
                                 </li>
                             ))}
                     </div>
@@ -241,21 +255,10 @@ const Dashboard: React.FC = () => {
     );
 
     const dialogDetalhesDiaSelecionado = (
-        <Modal open={verDetalheDia} title={diaSelecionado?.toDate().toDateString()} footer={[
-            <Button key={'cancel'} id={'cancel-detalhe-data'} className={'cancel-button'} type={"default"}
-                    htmlType={"reset"}
-                    form={'formDetalhesData'} icon={<CloseOutlined/>} onClick={() => setVerDetalheDia(false)}>
-                Cancelar
-            </Button>,
-            <Button key={'save'} id={'save'} type={"primary"} htmlType={"submit"} form={'formDetalhesData'}
-                    icon={<SaveOutlined/>}>
-                Salvar
-            </Button>,
-        ]} onCancel={() => {
-            let button = document.getElementById('cancel-detalhe-data');
-            if (button) button.click();
-            else setVerDetalheDia(false);
-        }}>
+        <Modal open={verDetalheDia} title={diaSelecionado?.toDate().toLocaleDateString()} footer={null}
+               onCancel={() => {
+                   setVerDetalheDia(false);
+               }}>
             <Tabs
                 type={'card'} items={dialogOptions}/>
         </Modal>
@@ -333,8 +336,7 @@ const Dashboard: React.FC = () => {
                             onChange={(newMonth) => {
                                 const now = value.clone().month(newMonth);
                                 setMesSelecionado(newMonth);
-                                console.log(newMonth)
-                                atualizarListaMovimentacoes();
+                                // atualizarListaMovimentacoes();
                                 onChange(now);
                             }}
                         >
@@ -350,7 +352,7 @@ const Dashboard: React.FC = () => {
                             onChange={(newYear) => {
                                 const now = value.clone().year(newYear);
                                 setAnoSelecionado(newYear)
-                                atualizarListaMovimentacoes();
+                                // atualizarListaMovimentacoes();
                                 onChange(now);
                             }}
                         >
@@ -377,8 +379,8 @@ const Dashboard: React.FC = () => {
                                       setMesSelecionado(e.month());
                                       atualizarListaMovimentacoes();
                                   }
-                              }
-                              }
+                                  setDiaSelecionado(e)
+                              }}
                     />
 
                 </Col>
@@ -402,8 +404,7 @@ const Dashboard: React.FC = () => {
                                 label: item.descricao,
                                 children: movimentacoes.filter(m => m.conta.id === item.id).map(
                                     (movimentacao, index) => (
-                                        <p key={index}>{movimentacao.descricao} -
-                                            R$ {movimentacao.valor.toFixed(2)}</p>
+                                        <p key={index}>{movimentacao.descricao} - R$ {movimentacao.valor.toFixed(2)} - {movimentacao.cartao ? movimentacao.cartao.descricao : 'A vista'}</p>
                                     )
                                 )
                             }
