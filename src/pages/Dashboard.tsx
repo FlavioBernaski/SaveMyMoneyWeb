@@ -333,7 +333,6 @@ const Dashboard: React.FC = () => {
                             const now = dayjs();
                             setMesSelecionado(now.month());
                             setAnoSelecionado(now.year());
-                            atualizarListaMovimentacoes();
                             onChange(now);
                         }}
                     >
@@ -422,21 +421,16 @@ const Dashboard: React.FC = () => {
                             {
                                 key: index,
                                 label: item.descricao,
-                                children: (
-                                    <div>
-                                        {
-                                            movimentacoes.filter(m => m.conta.id === item.id).map(
-                                                (movimentacao, index) => (
-                                                    <p key={index}>{movimentacao.descricao} -
-                                                        R$ {movimentacao.valor.toFixed(2)} - {movimentacao.tipo === 'S' ? movimentacao.cartao ? movimentacao.cartao.descricao : 'A vista' : 'Entrada'}</p>
-                                                )
-                                            )
-                                        }
-                                        <p key="totalMes" title={'resto do mes'}>Total gasto no mês: R${totalMes.toFixed(2)}</p>
-                                    </div>
+                                children: movimentacoes.filter(m => m.conta.id === item.id).map(
+                                    (movimentacao, index) => (
+                                        <p key={index}>{movimentacao.descricao} -
+                                            R$ {movimentacao.valor.toFixed(2)} - {movimentacao.tipo === 'S' ? movimentacao.cartao ? movimentacao.cartao.descricao : 'A vista' : 'Entrada'}</p>
+                                    )
                                 )
                             }
                         ))}/>
+                        <p key="totalMes" title={'resto do mes'}>Saldo do mês: R${totalMes.toFixed(2)}</p>
+
                     </Card>
                 </Col>
                 {
