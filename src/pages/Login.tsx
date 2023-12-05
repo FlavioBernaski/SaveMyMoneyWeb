@@ -7,7 +7,7 @@ import {AuthContext} from "../contexts/Auth/AuthContext";
 const Login: React.FC = () => {
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
-    const [mensagem, setMensagem] = useState<string |null>(null)
+    const [mensagem, setMensagem] = useState<string | null>(null)
     const login = async (values: any) => {
         if (values.email && values.senha) {
             const response = await auth.signin(values.email, values.senha);
@@ -20,9 +20,11 @@ const Login: React.FC = () => {
         }
     };
     return (
-        <div>
+        <div style={{display: "flex", flexDirection: 'column'}}>
             {mensagem && <Alert message={mensagem} type={"error"}/>}
+            <img style={{margin: 'auto'}} alt={"Logo"} src={"logo192.png"}/>
             <Form name={"formLogin"}
+                  id={'formLogin'}
                   className={"login-form"}
                   initialValues={{remember: true,}}
                   onFinish={login}>
@@ -44,7 +46,7 @@ const Login: React.FC = () => {
                     <Form.Item name="remember" valuePropName="checked" noStyle>
                         <Checkbox>Manter conectado</Checkbox>
                     </Form.Item>
-                    <a className="login-form-forgot" href="">
+                    <a href={'#formLogin'} className="login-form-forgot" onClick={() => alert("Função não implementada ainda, me desculpe pelo transtorno")}>
                         Esqueci minha senha
                     </a>
                 </Form.Item>

@@ -7,7 +7,8 @@ import {BrowserRouter} from 'react-router-dom';
 import App from "./App";
 import {AuthProvider} from "./contexts/Auth/AuthProvider";
 
-const primaryColor: string = '#8f0ca3'
+const primaryColor: string = '#f68c00'
+const secondaryColor: string = '#d19552'
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -16,7 +17,10 @@ root.render(
     <AuthProvider>
         <BrowserRouter>
             <ConfigProvider theme={{
-                token: {colorPrimary: primaryColor},
+                token: {
+                    colorPrimary: primaryColor,
+                    colorBorderSecondary: secondaryColor
+                },
                 components: {
                     Button: {colorPrimary: primaryColor}
                 }

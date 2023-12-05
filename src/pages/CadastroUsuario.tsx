@@ -28,7 +28,8 @@ const Login: React.FC = () => {
         }
     };
     return (
-        <div className={"principal"}>
+        <div style={{display: "flex", flexDirection: 'column'}}>
+            <img style={{margin: 'auto'}} alt={"Logo"} src={"logo192.png"}/>
             <Form name={"formCadastro"}
                   requiredMark={false}
                   className={"login-form"}

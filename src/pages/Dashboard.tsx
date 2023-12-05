@@ -46,10 +46,17 @@ const Dashboard: React.FC = () => {
     const [diaSelecionado, setDiaSelecionado] = useState<Dayjs | undefined>(undefined);
     const [mesSelecionado, setMesSelecionado] = useState<number>(dayjs().month());
     const [anoSelecionado, setAnoSelecionado] = useState<number>(dayjs().year());
+    const [entradaSaida, setEntradaSaida] = useState<"E" | "S">("S")
+    const [totalMes, setTotalMes] = useState<number>(0);
 
     const atualizarListaMovimentacoes = useCallback(() => {
+        let somaMes: number = 0;
         api.listarMovimentacoesFiltroAnoMes(anoSelecionado, mesSelecionado)
-            .then((data) => setMovimentacoes(data))
+            .then((data) => {
+                setMovimentacoes(data);
+                (data as Movimentacao[]).forEach(d => (d.tipo === "S" ? somaMes -= d.valor : somaMes += d.valor))
+                setTotalMes(somaMes);
+            })
             .catch((err) => console.error(err.message));
     }, [anoSelecionado, api, mesSelecionado]);
 
@@ -151,7 +158,11 @@ const Dashboard: React.FC = () => {
                     label={''}
                     initialValue={'S'}
                     name={'tipo'}>
-                    <Radio.Group optionType={'button'} buttonStyle={"solid"}>
+                    <Radio.Group
+                        optionType={'button'}
+                        buttonStyle={"solid"}
+                        value={entradaSaida}
+                        onChange={(e) => setEntradaSaida(e.target.value)}>
                         <Radio value={'S'}>Saída</Radio>
                         <Radio value={'E'}>Entrada</Radio>
                     </Radio.Group>
@@ -192,11 +203,12 @@ const Dashboard: React.FC = () => {
                     rules={[{required: true, message: 'Defina a data da movimentação!'}]}>
                     <DatePicker/>
                 </Form.Item>
-                <Radio.Group value={compraAVista} onChange={(e) => setCompraAVista(e.target.value)}>
+                <Radio.Group disabled={entradaSaida === "E"} value={compraAVista}
+                             onChange={(e) => setCompraAVista(e.target.value)}>
                     <Radio value={true}>A vista</Radio>
                     <Radio value={false}>A prazo</Radio>
                 </Radio.Group>
-                {!compraAVista ? (
+                {!compraAVista && entradaSaida === "S" ? (
                     <div style={{marginTop: '14px'}}>
                         <Form.Item
                             label={'Parcelas'}
@@ -336,7 +348,6 @@ const Dashboard: React.FC = () => {
                             onChange={(newMonth) => {
                                 const now = value.clone().month(newMonth);
                                 setMesSelecionado(newMonth);
-                                // atualizarListaMovimentacoes();
                                 onChange(now);
                             }}
                         >
@@ -375,12 +386,21 @@ const Dashboard: React.FC = () => {
                               style={{padding: "20px"}}
                               headerRender={headerCalendario}
                               onChange={(e) => {
+                                  let alterou: boolean = false;
                                   if (diaSelecionado?.month() !== e.month()) {
                                       setMesSelecionado(e.month());
+                                      alterou = true;
+                                  }
+                                  if (diaSelecionado?.year() !== e.year()) {
+                                      setAnoSelecionado(e.year());
+                                      alterou = true;
+                                  }
+                                  if (alterou) {
                                       atualizarListaMovimentacoes();
                                   }
                                   setDiaSelecionado(e)
-                              }}
+                              }
+                              }
                     />
 
                 </Col>
@@ -402,10 +422,18 @@ const Dashboard: React.FC = () => {
                             {
                                 key: index,
                                 label: item.descricao,
-                                children: movimentacoes.filter(m => m.conta.id === item.id).map(
-                                    (movimentacao, index) => (
-                                        <p key={index}>{movimentacao.descricao} - R$ {movimentacao.valor.toFixed(2)} - {movimentacao.cartao ? movimentacao.cartao.descricao : 'A vista'}</p>
-                                    )
+                                children: (
+                                    <div>
+                                        {
+                                            movimentacoes.filter(m => m.conta.id === item.id).map(
+                                                (movimentacao, index) => (
+                                                    <p key={index}>{movimentacao.descricao} -
+                                                        R$ {movimentacao.valor.toFixed(2)} - {movimentacao.tipo === 'S' ? movimentacao.cartao ? movimentacao.cartao.descricao : 'A vista' : 'Entrada'}</p>
+                                                )
+                                            )
+                                        }
+                                        <p key="totalMes" title={'resto do mes'}>Total gasto no mês: R${totalMes.toFixed(2)}</p>
+                                    </div>
                                 )
                             }
                         ))}/>
