@@ -1,12 +1,6 @@
 import {Layout, Menu, MenuProps} from 'antd';
 import React, {useContext} from 'react';
-import {
-    CalendarOutlined,
-    CreditCardOutlined,
-    LogoutOutlined,
-    MoneyCollectOutlined,
-    UserOutlined
-} from "@ant-design/icons";
+import {CalendarOutlined, CreditCardOutlined, LogoutOutlined, MoneyCollectOutlined} from "@ant-design/icons";
 import {AuthContext} from "../contexts/Auth/AuthContext";
 import {useNavigate} from "react-router-dom";
 
@@ -31,11 +25,6 @@ export const Template = ({templateKey, children}: { templateKey: any, children: 
             label: 'Contas',
             key: 'contas',
             icon: <MoneyCollectOutlined/>
-        },
-        {
-            label: 'Usuário',
-            key: 'usuario',
-            icon: <UserOutlined/>
         },
         {
             label: 'Sair',

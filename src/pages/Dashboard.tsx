@@ -18,14 +18,20 @@ import {
 } from 'antd';
 import React, {useCallback, useEffect, useState} from 'react';
 import type {Dayjs} from 'dayjs';
+import dayjs from 'dayjs'
+import 'dayjs/locale/pt-br'
 import {Template} from "./Template";
 import {useApi} from "../hooks/useApi";
 import {Movimentacao} from "../types/Movimentacao";
 import {Conta} from "../types/Conta";
-import {SelectInfo} from "antd/es/calendar/generateCalendar";
+import {CalendarMode, SelectInfo} from "antd/es/calendar/generateCalendar";
 import {CloseOutlined, PlusOutlined, SaveOutlined} from "@ant-design/icons";
 import {Cartao} from "../types/Cartao";
 import {getUUID} from "../utils/uuid";
+import "dayjs/plugin/localeData";
+import locale from "antd/es/date-picker/locale/pt_BR";
+
+dayjs.locale('pt-br');
 
 const Dashboard: React.FC = () => {
     const api = useApi();
@@ -37,12 +43,14 @@ const Dashboard: React.FC = () => {
     const [diaSelecionado, setDiaSelecionado] = useState<Dayjs | undefined>(undefined);
     const [compraAVista, setCompraAVista] = useState<boolean>(true);
     const [cartoes, setCartoes] = useState<Cartao[]>([])
+    const [mesSelecionado, setMesSelecionado] = useState<number>(dayjs().month())
+    const [anoSelecionado, setAnoSelecionado] = useState<number>(dayjs().year())
 
     const atualizarListaMovimentacoes = useCallback(() => {
-        api.listarMovimentacoes()
+        api.listarMovimentacoesFiltroAnoMes(anoSelecionado, mesSelecionado)
             .then((data) => setMovimentacoes(data))
             .catch((err) => console.error(err.message));
-    }, [api]);
+    }, [anoSelecionado, api, mesSelecionado]);
 
     const atualizarListaContas = useCallback(() => {
         api.listarContas()
@@ -257,17 +265,132 @@ const Dashboard: React.FC = () => {
         setVerCadastroMovimentacao(true);
     }
 
+    const headerCalendario = (
+        {value, type, onChange, onTypeChange}: {
+            value: Dayjs,
+            type: CalendarMode,
+            onChange: (date: Dayjs) => void,
+            onTypeChange: (type: CalendarMode) => void
+        }) => {
+        const start = 0;
+        const end = 12;
+        const monthOptions = [];
+
+        let current = value.clone();
+        const localeData = value.localeData();
+        const months = [];
+        for (let i = 0; i < 12; i++) {
+            current = current.month(i);
+            months.push(localeData.months(current));
+        }
+
+        for (let i = start; i < end; i++) {
+            monthOptions.push(
+                <Select.Option key={i} value={i} className="month-item">
+                    {months[i]}
+                </Select.Option>,
+            );
+        }
+
+        const year = value.year();
+        const month = value.month();
+        const options = [];
+        for (let i = year - 10; i < year + 10; i += 1) {
+            options.push(
+                <Select.Option key={i} value={i} className="year-item">
+                    {i}
+                </Select.Option>,
+            );
+        }
+        return (
+            <div style={{
+                padding: 8,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+            }}>
+                <h2>Gastos do mês</h2>
+                <Row gutter={8}>
+                    <Button
+                        type={"dashed"}
+                        size={'large'}
+                        onClick={() => {
+                            const now = dayjs();
+                            setMesSelecionado(now.month());
+                            setAnoSelecionado(now.year());
+                            atualizarListaMovimentacoes();
+                            onChange(now);
+                        }}
+                    >
+                        Hoje
+                    </Button>
+                    <Col>
+                        <Select
+                            size={'large'}
+                            bordered={false}
+                            popupMatchSelectWidth={true}
+                            value={month}
+                            onChange={(newMonth) => {
+                                const now = value.clone().month(newMonth);
+                                setMesSelecionado(newMonth);
+                                console.log(newMonth)
+                                atualizarListaMovimentacoes();
+                                onChange(now);
+                            }}
+                        >
+                            {monthOptions}
+                        </Select>
+                    </Col>
+                    <Col>
+                        <Select
+                            size={'large'}
+                            bordered={false}
+                            popupMatchSelectWidth={true}
+                            value={year}
+                            onChange={(newYear) => {
+                                const now = value.clone().year(newYear);
+                                setAnoSelecionado(newYear)
+                                atualizarListaMovimentacoes();
+                                onChange(now);
+                            }}
+                        >
+                            {options}
+                        </Select>
+                    </Col>
+                </Row>
+            </div>
+        )
+    }
+
     return (
         <Template templateKey={'dashboard'}>
             <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
                 {/*CALENDÁRIO*/}
                 <Col span={'18'}>
-                    <Calendar cellRender={cellRender} onSelect={abrirDialogData} style={{padding: "20px"}}/>
+                    <Calendar cellRender={cellRender}
+                              onSelect={abrirDialogData}
+                              locale={locale}
+                              style={{padding: "20px"}}
+                              headerRender={headerCalendario}
+                              onChange={(e) => {
+                                  if (diaSelecionado?.month() !== e.month()) {
+                                      setMesSelecionado(e.month());
+                                      atualizarListaMovimentacoes();
+                                  }
+                              }
+                              }
+                    />
+
                 </Col>
-                {/*SALDO*/}
+                {/*SALDO*/
+                }
                 <Col span={'6'}>
                     <Card title={(
-                        <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                        <div style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center"
+                        }}>
                             <span>Saldo</span>
                             <Button icon={<PlusOutlined/>} type={"primary"}
                                     onClick={abrirCadastroMovimentacao}>Nova movimentação</Button>
@@ -279,18 +402,24 @@ const Dashboard: React.FC = () => {
                                 label: item.descricao,
                                 children: movimentacoes.filter(m => m.conta.id === item.id).map(
                                     (movimentacao, index) => (
-                                        <p key={index}>{movimentacao.descricao} - R$ {movimentacao.valor.toFixed(2)}</p>
+                                        <p key={index}>{movimentacao.descricao} -
+                                            R$ {movimentacao.valor.toFixed(2)}</p>
                                     )
                                 )
                             }
                         ))}/>
                     </Card>
                 </Col>
-                {dialogDetalhesDiaSelecionado}
-                {dialogCadastroMovimentacao}
+                {
+                    dialogDetalhesDiaSelecionado
+                }
+                {
+                    dialogCadastroMovimentacao
+                }
             </Row>
         </Template>
-    );
+    )
+        ;
 }
 
 export default Dashboard;

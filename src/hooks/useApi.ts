@@ -40,6 +40,19 @@ export const useApi = () => useMemo(() => ({
         const response = await api.get("/movimentacoes", getHeader());
         return response.data;
     },
+    listarMovimentacoesFiltroAnoMes: async (ano: number, mes: number) => {
+        const response = await api.get("/movimentacoes/filtro_data",
+            {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                params: {
+                    'ano': ano,
+                    'mes': mes
+                }
+        });
+        return response.data;
+    },
     cadastrarMovimentacao: async (movimentacao: Movimentacao) => {
         const response = await api.post('/movimentacoes', movimentacao, getHeader());
         return response.data;
