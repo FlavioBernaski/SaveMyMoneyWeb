@@ -1,5 +1,5 @@
-import {Button, Form, Input} from 'antd';
-import React, {useContext} from 'react';
+import {Alert, Button, Form, Input} from 'antd';
+import React, {useContext, useState} from 'react';
 import {Link, useNavigate} from "react-router-dom";
 import {AuthContext} from "../contexts/Auth/AuthContext";
 import {Usuario} from "../types/Usuario";
@@ -9,11 +9,12 @@ import {getUUID} from "../utils/uuid";
 const Login: React.FC = () => {
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
+    const [mensagem, setMensagem] = useState<string | null>(null)
     const api = useApi();
     const cadastro = async (values: any) => {
         let novo: Usuario = new Usuario();
         if (values.senha !== values.confirmacaoSenha) {
-            console.error("senhas divergentes");
+            setMensagem("Senhas divergentes");
             return;
         }
         novo.id = getUUID()
@@ -21,14 +22,18 @@ const Login: React.FC = () => {
         novo.nome = values.nome;
         novo.email = values.email;
         novo.versao = Date.now();
-        const response = await api.signin(novo);
-        if (response) {
-            await auth.signin(values.email, values.senha);
-            navigate("/")
-        }
+        api.signin(novo)
+            .then(async() => {
+                await auth.signin(values.email, values.senha);
+                navigate("/")
+            })
+            .catch((err) => setMensagem(err.response.data.message));
+
+
     };
     return (
         <div style={{display: "flex", flexDirection: 'column'}}>
+            {mensagem && <Alert message={mensagem} type={"error"}/>}
             <img style={{margin: 'auto'}} alt={"Logo"} src={"logo192.png"}/>
             <Form name={"formCadastro"}
                   requiredMark={false}
