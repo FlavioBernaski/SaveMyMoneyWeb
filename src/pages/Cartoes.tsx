@@ -33,14 +33,6 @@ const Cartoes: React.FC = () => {
         atualizarListaContas();
     }, [atualizarListaCartoes, atualizarListaContas]);
 
-    const excluirCartao = (item: Cartao): MouseEventHandler => {
-        return () => {
-            api.excluirCartao(item.id)
-                .then(() => atualizarListaCartoes())
-                .catch((err) => console.error(err.message));
-        }
-    }
-
     const columns: ColumnsType<Cartao> = [
         {
             title: 'Descrição',
@@ -76,7 +68,11 @@ const Cartoes: React.FC = () => {
                 <Popconfirm title={"Exclusão de cartão"}
                             description={'Deseja mesmo excluir esse item?'}
                             okText={'Sim'}
-                            onConfirm={() => excluirCartao(item)}>
+                            onConfirm={() => {
+                                api.excluirCartao(item.id)
+                                    .then(() => atualizarListaCartoes())
+                                    .catch((err) => console.error(err.message));
+                            }}>
                     <Button icon={<DeleteOutlined/>} className={'cancel-button'}>Excluir</Button>
                 </Popconfirm>
             )
@@ -116,7 +112,13 @@ const Cartoes: React.FC = () => {
             <Form name={"formCadastroCartao"}
                   className={"cadastro-cartao"}
                   requiredMark={false} layout={"vertical"}
-                  onFinish={cadastrar}>
+                  preserve={false}
+                  onFinish={(e) => {
+                      cadastrar(e);
+                      let button = document.getElementById('cancel');
+                      if (button) button.click();
+                      else setOpen(false);
+                  }}>
                 <Form.Item
                     label={'Conta'}
                     name={"idConta"}

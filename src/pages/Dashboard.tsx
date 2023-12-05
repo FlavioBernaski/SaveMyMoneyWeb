@@ -153,7 +153,12 @@ const Dashboard: React.FC = () => {
         }}>
             <Form name={'formCadastroMovimentacao'}
                   requiredMark={false} layout={"vertical"}
-                  onFinish={cadastrarMovimentacao}>
+                  onFinish={(e) => {
+                      cadastrarMovimentacao(e);
+                      let button = document.getElementById('cancel-cadastro-movimentacao');
+                      if (button) button.click();
+                      else fecharCadastroMovimentacao();
+                  }}>
                 <Form.Item
                     label={''}
                     initialValue={'S'}
@@ -245,7 +250,7 @@ const Dashboard: React.FC = () => {
                                 new Date(m.dataEntrada).toDateString() === diaSelecionado?.toDate().toDateString())
                             .map((value, index) => (
                                 <li key={index} style={{display: 'flex', alignItems: 'center'}}>
-                                    <span>{value.descricao}: R${value.valor.toFixed(2)}</span>
+                                    <span style={{padding:6}}>{value.descricao}: R${value.valor.toFixed(2)}</span>
                                     <Popconfirm title={"Exclusão de movimentação"}
                                                 description={'Deseja mesmo excluir esse item?'}
                                                 okText={'Sim'}

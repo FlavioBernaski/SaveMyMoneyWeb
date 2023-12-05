@@ -1,5 +1,5 @@
 import {Button, Form, Input, Modal, Popconfirm, Table} from 'antd';
-import React, {MouseEventHandler, useCallback, useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {Template} from "./Template";
 import {useApi} from "../hooks/useApi";
 import {ColumnsType} from "antd/es/table";
@@ -24,14 +24,6 @@ const Contas: React.FC = () => {
         atualizarListaContas();
     }, [atualizarListaContas]);
 
-    const excluirConta = (item: Conta): MouseEventHandler => {
-        return () => {
-            api.excluirConta(item.id)
-                .then(() => atualizarListaContas())
-                .catch((err) => console.error(err.message));
-        }
-    }
-
     const columns: ColumnsType<Conta> = [
         {
             title: 'Descrição',
@@ -54,7 +46,11 @@ const Contas: React.FC = () => {
                 <Popconfirm title={"Exclusão de conta"}
                             description={'Deseja mesmo excluir esse item?'}
                             okText={'Sim'}
-                            onConfirm={() => excluirConta(item)}>
+                            onConfirm={() => {
+                                api.excluirConta(item.id)
+                                    .then(() => atualizarListaContas())
+                                    .catch((err) => console.error(err.message));
+                            }}>
                     <Button icon={<DeleteOutlined/>} className={'cancel-button'}>Excluir</Button>
                 </Popconfirm>
             )
@@ -94,7 +90,12 @@ const Contas: React.FC = () => {
             <Form name={"formCadastroContas"}
                   className={"cadastro-cartao"}
                   requiredMark={false} layout={"vertical"}
-                  onFinish={cadastrar}>
+                  onFinish={(e) => {
+                      cadastrar(e);
+                      let button = document.getElementById('cancel');
+                      if (button) button.click();
+                      else setOpen(false);
+                  }}>
                 <Form.Item
                     label={'Nome da conta'}
                     name={"descricao"}
